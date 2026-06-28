@@ -1,0 +1,37 @@
+{
+  "name": "mailspring-spoof-guard",
+  "main": "./lib/main",
+  "version": "0.1.0",
+  "description": "Detects spoofed, phishing, scam and spam email by inspecting raw headers (SPF/DKIM/DMARC + alignment) and message content, then shows a risk score and the reasons behind it directly in the message view.",
+  "license": "MIT",
+  "author": "Carl Prewitt JR",
+  "homepage": "https://github.com/rages4calm/mailspring-spoof-guard",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rages4calm/mailspring-spoof-guard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rages4calm/mailspring-spoof-guard/issues"
+  },
+  "keywords": [
+    "mailspring",
+    "mailspring-plugin",
+    "phishing",
+    "spoofing",
+    "spam",
+    "email-security",
+    "spf",
+    "dkim",
+    "dmarc"
+  ],
+  "engines": {
+    "mailspring": ">=1.6.3"
+  },
+  "windowTypes": {
+    "default": true,
+    "thread-popout": true
+  },
+  "scripts": {
+    "test": "node test/run.js"
+  }
+}

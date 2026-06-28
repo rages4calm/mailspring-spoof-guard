@@ -1,0 +1,15 @@
+node_modules/
+*.log
+npm-debug.log*
+
+# Temp files the plugin writes while fetching raw message source
+spoofguard_*.eml
+spoofguard_bg_*.eml
+auth_*.eml
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
