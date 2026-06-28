@@ -5,7 +5,26 @@ clear **risk score (0–100)** with the **exact reasons** it was flagged — bui
 spoofed, phishing, scam, and extortion mail across multiple domain accounts, while
 **not** turning legitimate mail into a hunt.
 
-It is **advisory only**: it never deletes, moves, blocks, or rewrites mail.
+It is **advisory by default**: it never deletes or rewrites mail, and only moves mail to
+Spam if you explicitly turn on auto-move in settings.
+
+## Screenshots
+
+A message flagged **High risk**, with the reasons spelled out:
+
+![High-risk message detail](images/badge-high-risk.png)
+
+A **legitimate**, allow-listed message — note the host's "Definitely Spam?" tag is ignored:
+
+![Legitimate message detail](images/badge-legit.png)
+
+Settings — allow-list, block-list, and your domains:
+
+![Settings: trust lists](images/settings-lists.png)
+
+Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
+
+![Settings: automation](images/settings-automove.png)
 
 ## What it checks
 
