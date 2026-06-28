@@ -153,6 +153,27 @@ t('legit DKIM-signed account email', [
   '<p>Please update your payment details. <a href="https://www.netflix.com/account">Sign in</a></p>',
 ].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 1 });
 
+// 10) 2026 trend: phishing page delivered as an .html attachment.
+t('html-attachment phishing', [
+  'Return-Path: <noreply@delivery-update.top>',
+  'Authentication-Results: mx; spf=none; dkim=none; dmarc=none',
+  'From: Delivery <noreply@delivery-update.top>',
+  'To: you@yourdomain.com',
+  'Subject: Your parcel could not be delivered',
+  'Content-Type: multipart/mixed; boundary="b9"',
+  '',
+  '--b9',
+  'Content-Type: text/plain',
+  '',
+  'See the attached document to reschedule.',
+  '--b9',
+  'Content-Type: text/html; name="Delivery_Details.html"',
+  'Content-Disposition: attachment; filename="Delivery_Details.html"',
+  '',
+  '<html>fake login</html>',
+  '--b9--',
+].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 2, mustHave: ['markup_attachment'] });
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;
