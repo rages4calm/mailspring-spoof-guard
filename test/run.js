@@ -114,6 +114,45 @@ t('host false-positive on legit mail', [
   maxLevelRank: 1,
 });
 
+// 8) Real-world: cPanel/webmail "your password expires" credential phish.
+//    No From-domain spoof, no Authentication-Results (host stripped it), null
+//    Return-Path, external .click link. Must land at least HIGH so it auto-moves.
+t('webmail password-expiry phish', [
+  'Return-Path: <>',
+  'Received: from 190.16.83.34.bc.googleusercontent.com ([34.83.16.190])',
+  '  by reynolds.example-host.com with esmtp',
+  'From: Webmail Account <service@webmail.com>',
+  'To: you@yourdomain.com',
+  'Subject: yourdomain.com Service Account Update Requirment',
+  'X-Spam-Status: No',
+  'MIME-Version: 1.0',
+  'Content-Type: text/html; charset="utf-8"',
+  '',
+  '<html><body>',
+  '<p>This is an urgent Reminder that your email account Password is set to Expire in 24Hrs.</p>',
+  '<p>Please update and keep the same password for you@yourdomain.com after you sign in below with your current password.</p>',
+  '<a href="https://medicinalmente.click/Reaad.html#you@yourdomain.com">Keep Same Password</a>',
+  '</body></html>',
+].join('\r\n'), {
+  account: 'you@yourdomain.com',
+  minLevelRank: 2,
+  mustHave: ['credential_phish_link', 'return_path_null', 'link_suspicious_tld'],
+});
+
+// 9) Legit transactional mail with credential-ish language that is DKIM-signed
+//    by its own domain (even though the host stripped Authentication-Results).
+//    Must stay LOW — self-signed by netflix.com recovers trust.
+t('legit DKIM-signed account email', [
+  'Return-Path: <bounce@netflix.com>',
+  'DKIM-Signature: v=1; a=rsa-sha256; d=netflix.com; s=k1; h=from:subject; b=abc123',
+  'From: Netflix <info@netflix.com>',
+  'To: you@yourdomain.com',
+  'Subject: Update your payment method',
+  'Content-Type: text/html',
+  '',
+  '<p>Please update your payment details. <a href="https://www.netflix.com/account">Sign in</a></p>',
+].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 1 });
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;
