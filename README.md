@@ -32,21 +32,29 @@ Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
 - SPF / DKIM / DMARC pass / fail / softfail
 - **Alignment** — does the domain that actually authenticated match the visible `From:`?
 - ARC seal (trusted forwarding, so legit mailing-list mail isn't punished)
+- **Self-signed trust recovery** — if your mail host strips the `Authentication-Results`
+  header, the plugin reads the message's own aligned `DKIM-Signature` so legitimately
+  signed mail (Netflix, banks, etc.) still gets the benefit of the doubt
 
 **Spoofing / impersonation:**
 - **Your own domain spoofed** (`From:` looks like your domain but didn't authenticate as it)
 - **Someone using *your* name from an unrelated free-mail address** (e.g. `"Jane Smith" <random@gmail.com>`)
 - Display-name impersonation of known brands (PayPal, Microsoft, banks…)
 - Look-alike / typosquatted domains (`paypa1.com`), punycode / **homoglyph** Unicode tricks
-- `Reply-To` / `Return-Path` mismatches, and **BEC** (corporate-looking sender, replies go to Gmail)
+- `Reply-To` / `Return-Path` mismatches, **empty `Return-Path: <>`**, and **BEC**
+  (corporate-looking sender, replies go to Gmail)
 
 **Content / links / attachments:**
 - Sextortion / blackmail and crypto-ransom language
-- Credential-phishing ("verify/unlock your account"), fake-invoice / billing language
+- **Credential / login phishing** — "verify/unlock your account", "your password is set to
+  expire", "sign in below", "keep the same password" — scored **High** when it also drives
+  you to an external site and the message isn't authenticated
+- Fake-invoice / billing language
 - Links whose visible text lies about their real destination, raw-IP URLs, punycode URLs,
-  `@`-obfuscated URLs, URL shorteners
+  `@`-obfuscated URLs, URL shorteners, and links to **abuse-prone TLDs** (`.click`, `.top`, …)
 - **Quishing** (QR-code phishing)
-- Dangerous attachments and deceptive double extensions (`invoice.pdf.exe`)
+- Dangerous attachments, deceptive double extensions (`invoice.pdf.exe`), and
+  **HTML/SVG "page-as-a-file" attachments** (a fast-rising 2026 phishing vector)
 
 **Your host's noise is ignored on purpose:** subject tags your cPanel/MailScanner host
 injects — like `{Disarmed}` or `{Definitely Spam?}` — are **stripped and given zero weight**,
