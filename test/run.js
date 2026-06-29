@@ -174,6 +174,42 @@ t('html-attachment phishing', [
   '--b9--',
 ].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 2, mustHave: ['markup_attachment'] });
 
+// 11) Real-world: DocuSign-impersonation document phish. Brand faked in the
+//     BODY (not From), real docusign.com decoy links + a real payload link on a
+//     .zw domain, no auth. Must land High/Very-high (was a false negative at 13).
+t('docusign-impersonation document phish', [
+  'Return-Path: <info@robrix.ca>',
+  'Received: from [66.175.235.26] by reynolds.example-host.com with esmtp',
+  'From: eDocSign Signature <info@robrix.ca>',
+  'To: you@yourdomain.com',
+  'Subject: Processed: You received a document that requires your review',
+  'MIME-Version: 1.0',
+  'Content-Type: text/html; charset="utf-8"',
+  '',
+  '<div class="hero"><div>A document has been sent for your review</div>',
+  '<a href="https://foresight.co.zw/vb.php">View Document</a></div>',
+  '<p>Please review the attached document at your convenience.</p>',
+  '<div class="footer">Access documents on <a href="https://app.docusign.com/documents">DocuSign</a>.',
+  ' About Docusign: Sign securely. Sent by Ashley Allen via Docusign.</div>',
+].join('\r\n'), {
+  account: 'you@yourdomain.com',
+  minLevelRank: 2,
+  mustHave: ['document_phish', 'brand_impersonation'],
+});
+
+// 12) Legit DocuSign (from docusign.net, DKIM-signed) must stay LOW even with
+//     all the same brand/document language — sender IS the brand + signed.
+t('legit docusign signed', [
+  'Return-Path: <dse@docusign.net>',
+  'DKIM-Signature: v=1; a=rsa-sha256; d=docusign.net; s=k1; h=from; b=zz',
+  'From: DocuSign <dse@docusign.net>',
+  'To: you@yourdomain.com',
+  'Subject: You received a document to review and sign',
+  'Content-Type: text/html',
+  '',
+  '<p>A document has been sent for your review. <a href="https://app.docusign.com/d">View Document</a></p>',
+].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 1 });
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;

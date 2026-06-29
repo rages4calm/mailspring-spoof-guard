@@ -39,7 +39,9 @@ Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
 **Spoofing / impersonation:**
 - **Your own domain spoofed** (`From:` looks like your domain but didn't authenticate as it)
 - **Someone using *your* name from an unrelated free-mail address** (e.g. `"Jane Smith" <random@gmail.com>`)
-- Display-name impersonation of known brands (PayPal, Microsoft, banks…)
+- Brand impersonation (PayPal, Microsoft, **DocuSign**, banks…) — in the display name
+  **or in the body**, when the real sender and links don't belong to that brand
+- **Fake "document to review/sign" / e-signature notifications** linking to an external site
 - Look-alike / typosquatted domains (`paypa1.com`), punycode / **homoglyph** Unicode tricks
 - `Reply-To` / `Return-Path` mismatches, **empty `Return-Path: <>`**, and **BEC**
   (corporate-looking sender, replies go to Gmail)
