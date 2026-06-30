@@ -210,6 +210,67 @@ t('legit docusign signed', [
   '<p>A document has been sent for your review. <a href="https://app.docusign.com/d">View Document</a></p>',
 ].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 1 });
 
+// 13) Adult/male-enhancement spam, DKIM-signed by its own throwaway domain.
+//     Self-signing must NOT excuse it (auth proves the domain sent it, not that
+//     it's wanted). Was 0/100.
+t('adult/male-enhancement spam (self-signed)', [
+  'Return-Path: <6519-295-carl=yourdomain.com@mail.grness.shop>',
+  'DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=k1; d=grness.shop; i=hardnaturally@grness.shop; b=zz',
+  'From: "hardaturally" <hardnaturally@grness.shop>',
+  'To: <you@yourdomain.com>',
+  'Subject: Chew for 7 seconds = rock hard wood    heads up',
+  'Content-Type: text/html',
+  '',
+  '<p>I look at men’s vitality differently now. A male performance solution — an ancient virility remedy.',
+  ' <a href="http://grness.shop/x">Do this at home to IGNITE the passion</a>. Don’t tell your wife or girlfriend.</p>',
+].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 2, mustHave: ['spam_content'] });
+
+// 14) Health "miracle cure" clickbait spam, self-signed throwaway domain.
+t('miracle-cure health spam (self-signed)', [
+  'Return-Path: <6523-carl=yourdomain.com@mail.nronais.shop>',
+  'DKIM-Signature: v=1; a=rsa-sha1; s=k1; d=nronais.shop; i=x@nronais.shop; b=zz',
+  'From: "expensivemedications" <expensivemedications@nronais.shop>',
+  'To: <you@yourdomain.com>',
+  'Subject: Stanford scientists reveal: This bedtime ritual reverses nerve damage overnight',
+  'Content-Type: text/html',
+  '',
+  '<p>Big Pharma doesn’t want you to know this simple bedtime ritual that reverses nerve damage overnight.',
+  ' The pharmaceutical industry tried to ban it. <a href="http://nronais.shop/v">Click here to watch the controversial video before it’s taken down</a>. Costs less than a cup of coffee.</p>',
+].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 2, mustHave: ['spam_content'] });
+
+// 15) Spoof of the user's OWN domain with NO Authentication-Results (host strips
+//     it), null Return-Path, AWS-hosted phishing page. Was only 20/100.
+t('own-domain spoof, no auth header', [
+  'Return-Path: <>',
+  'Received: from 223.66.62.34.bc.googleusercontent.com ([34.62.66.223]) by reynolds.example-host.com',
+  'From: Server Security Notification <HelpDesk@yourdomain.com>',
+  'To: you@yourdomain.com',
+  'Subject: Email Account Verification',
+  'Content-Type: text/html',
+  '',
+  '<p>Mail Verification. The password of your email account will expire soon. To continue using your',
+  ' you@yourdomain.com kindly re-confirm ownership below.',
+  ' <a href="https://verificationnn-711613.s3.amazonaws.com/x.html?c=you@yourdomain.com">Re-confirm Password</a></p>',
+].join('\r\n'), {
+  account: 'you@yourdomain.com', accountName: 'You',
+  minLevelRank: 3, mustHave: ['internal_spoof'],
+});
+
+// 16) Authenticated advance-fee/BEC lure: real DMARC pass, but display name
+//     ("Maria Guerra") != address (avery.barnes@...). Was 0/100.
+t('authenticated investment lure, name != address', [
+  'Authentication-Results: mx; spf=pass smtp.mailfrom=nassaucreditx.info;',
+  ' dkim=pass header.d=nassaucreditx.info; dmarc=pass header.from=nassaucreditx.info',
+  'DKIM-Signature: v=1; a=rsa-sha256; d=nassaucreditx.info; s=s1; b=zz',
+  'From: Maria Guerra <avery.barnes@nassaucreditx.info>',
+  'To: you@yourdomain.com',
+  'Subject: Lining up resources for a possible private family office investment',
+  'Content-Type: text/plain',
+  '',
+  'Hi, We work with businesses looking to attract private capital of $2-$35M from single-family offices.',
+  ' Are you open to a conversation? Maria Guerra',
+].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 1, mustHave: ['advance_fee_lure'] });
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;

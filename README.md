@@ -37,26 +37,37 @@ Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
   signed mail (Netflix, banks, etc.) still gets the benefit of the doubt
 
 **Spoofing / impersonation:**
-- **Your own domain spoofed** (`From:` looks like your domain but didn't authenticate as it)
+- **Your own domain spoofed** — `From:` looks like one of your domains but the message
+  isn't authenticated *or* aligned-DKIM-signed as it. **Works even when your host strips the
+  `Authentication-Results` header** (real mail from your domain is always signed/authenticated;
+  if it's neither, it's a spoof).
 - **Someone using *your* name from an unrelated free-mail address** (e.g. `"Jane Smith" <random@gmail.com>`)
 - Brand impersonation (PayPal, Microsoft, **DocuSign**, banks…) — in the display name
   **or in the body**, when the real sender and links don't belong to that brand
 - **Fake "document to review/sign" / e-signature notifications** linking to an external site
+- **Display name that doesn't match the address** (e.g. `"Maria Guerra" <avery.barnes@…>`),
+  paired with advance-fee / "raise capital" / investment lures
 - Look-alike / typosquatted domains (`paypa1.com`), punycode / **homoglyph** Unicode tricks
-- `Reply-To` / `Return-Path` mismatches, **empty `Return-Path: <>`**, and **BEC**
-  (corporate-looking sender, replies go to Gmail)
+- `Reply-To` / `Return-Path` mismatches, **empty `Return-Path: <>`**, **deprecated rsa-sha1
+  DKIM** (common in throwaway spam infra), and **BEC** (corporate-looking sender, replies go to Gmail)
 
 **Content / links / attachments:**
 - Sextortion / blackmail and crypto-ransom language
 - **Credential / login phishing** — "verify/unlock your account", "your password is set to
-  expire", "sign in below", "keep the same password" — scored **High** when it also drives
-  you to an external site and the message isn't authenticated
+  expire", "sign in below", "re-confirm ownership" — scored **High** when it also drives you
+  to an external site and the message isn't authenticated
+- **Bulk spam** — adult / male-enhancement, "miracle cure" / "Big Pharma" health clickbait
+  (scored on content, since a domain that DKIM-signs its *own* spam is still spam)
 - Fake-invoice / billing language
 - Links whose visible text lies about their real destination, raw-IP URLs, punycode URLs,
-  `@`-obfuscated URLs, URL shorteners, and links to **abuse-prone TLDs** (`.click`, `.top`, …)
+  `@`-obfuscated URLs, URL shorteners, and links to **abuse-prone TLDs** (`.click`, `.top`, `.zw`, …)
 - **Quishing** (QR-code phishing)
 - Dangerous attachments, deceptive double extensions (`invoice.pdf.exe`), and
   **HTML/SVG "page-as-a-file" attachments** (a fast-rising 2026 phishing vector)
+
+**Authentication is treated as "did the domain really send this," not "is it safe."** A
+message can pass SPF/DKIM/DMARC and still be phishing or spam — so authentication only
+suppresses *spoofing* checks; content, impersonation, and spam checks always run.
 
 **Your host's noise is ignored on purpose:** subject tags your cPanel/MailScanner host
 injects — like `{Disarmed}` or `{Definitely Spam?}` — are **stripped and given zero weight**,
