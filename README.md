@@ -63,7 +63,8 @@ Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
   `@`-obfuscated URLs, URL shorteners, and links to **abuse-prone TLDs** (`.click`, `.top`, `.zw`, …)
 - **Quishing** (QR-code phishing)
 - Dangerous attachments, deceptive double extensions (`invoice.pdf.exe`), and
-  **HTML/SVG "page-as-a-file" attachments** (a fast-rising 2026 phishing vector)
+  **HTML/SVG "page-as-a-file" attachments** (a fast-rising 2026 phishing vector) —
+  true attachments only; inline `cid:` images/logos in newsletters are not flagged
 
 **Authentication is treated as "did the domain really send this," not "is it safe."** A
 message can pass SPF/DKIM/DMARC and still be phishing or spam — so authentication only

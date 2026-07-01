@@ -271,6 +271,41 @@ t('authenticated investment lure, name != address', [
   ' Are you open to a conversation? Maria Guerra',
 ].join('\r\n'), { account: 'you@yourdomain.com', minLevelRank: 1, mustHave: ['advance_fee_lure'] });
 
+// 17) FP guard: "ups" must not match inside "Groups"/"startups" (word-boundary
+//     brand matching). This benign digest previously risked display_name_brand.
+t('no brand FP on "Groups Digest"', [
+  'Return-Path: <digest@meetupsandgroups.io>',
+  'From: "Groups Digest" <digest@meetupsandgroups.io>',
+  'To: you@yourdomain.com',
+  'Subject: Your weekly startups roundup',
+  'Content-Type: text/html',
+  '',
+  '<p>This week in startups and meetups: sign in below to see your groups.',
+  ' <a href="https://meetupsandgroups.io/digest">View your digest</a></p>',
+].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 1, mustNotHave: ['display_name_brand', 'brand_impersonation'] });
+
+// 18) FP guard: inline cid: SVG logo is a body asset, not a markup attachment.
+t('no markup-attachment FP on inline svg logo', [
+  'Return-Path: <news@realshop.com>',
+  'DKIM-Signature: v=1; a=rsa-sha256; d=realshop.com; s=k1; b=zz',
+  'From: "RealShop" <news@realshop.com>',
+  'To: you@yourdomain.com',
+  'Subject: Summer sale is on',
+  'Content-Type: multipart/related; boundary="rel1"',
+  '',
+  '--rel1',
+  'Content-Type: text/html',
+  '',
+  '<p><img src="cid:logo.svg" /> Big summer sale, 20% off everything.</p>',
+  '--rel1',
+  'Content-Type: image/svg+xml; name="logo.svg"',
+  'Content-ID: <logo.svg>',
+  'Content-Disposition: inline; filename="logo.svg"',
+  '',
+  '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+  '--rel1--',
+].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 0, mustNotHave: ['markup_attachment'] });
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;
@@ -288,6 +323,9 @@ cases.forEach(function (c) {
     problems.push('levelRank ' + r.levelRank + ' > expected ' + c.expect.maxLevelRank);
   (c.expect.mustHave || []).forEach(function (id) {
     if (ids.indexOf(id) === -1) problems.push('missing signal "' + id + '"');
+  });
+  (c.expect.mustNotHave || []).forEach(function (id) {
+    if (ids.indexOf(id) !== -1) problems.push('unexpected signal "' + id + '"');
   });
   if (c.expect.noHostTagSignal && r.details.hostTags.length === 0)
     problems.push('expected host tag to be detected/stripped');
