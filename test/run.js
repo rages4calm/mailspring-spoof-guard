@@ -306,6 +306,42 @@ t('no markup-attachment FP on inline svg logo', [
   '--rel1--',
 ].join('\r\n'), { account: 'you@yourdomain.com', maxLevelRank: 0, mustNotHave: ['markup_attachment'] });
 
+// 19) The user's OWN sent reply (stored copy: no Received headers, no auth,
+//     From = the account's exact address). Must be exempt — previously scored
+//     70 as an "own-domain spoof" and auto-moved the whole thread to Spam.
+t('own sent reply is exempt', [
+  'Date: Wed, 8 Jul 2026 16:22:03 -0500',
+  'From: "You" <you@yourdomain.com>',
+  'To: Someone <someone@gmail.com>',
+  'Message-ID: <ABC-123@getmailspring.com>',
+  'In-Reply-To: <CAAu4RR7@mail.gmail.com>',
+  'Subject: Re: CC Agenda Posting',
+  'X-Mailer: Mailspring',
+  'MIME-Version: 1.0',
+  'Content-Type: text/plain; charset="utf-8"',
+  '',
+  'https://example-city.com/agenda - visible in document section as well',
+].join('\r\n'), {
+  account: 'you@yourdomain.com',
+  maxLevelRank: 0, mustNotHave: ['internal_spoof'], sentByMe: true,
+});
+
+// 20) Regression guard: an INBOUND spoof using the user's exact address (it has
+//     Received headers, so it actually traversed SMTP) must still flag.
+t('inbound spoof of exact own address still flags', [
+  'Return-Path: <>',
+  'Received: from evil.example ([203.0.113.9]) by reynolds.example-host.com with esmtp',
+  'From: "You" <you@yourdomain.com>',
+  'To: you@yourdomain.com',
+  'Subject: Mailbox notice',
+  'Content-Type: text/plain',
+  '',
+  'Your mailbox needs attention. Sign in below to keep your account: http://evil.example/x',
+].join('\r\n'), {
+  account: 'you@yourdomain.com',
+  minLevelRank: 3, mustHave: ['internal_spoof'],
+});
+
 // --- run ------------------------------------------------------------------
 
 var pass = 0, fail = 0;
@@ -329,6 +365,8 @@ cases.forEach(function (c) {
   });
   if (c.expect.noHostTagSignal && r.details.hostTags.length === 0)
     problems.push('expected host tag to be detected/stripped');
+  if (c.expect.sentByMe && !r.details.sentByMe)
+    problems.push('expected details.sentByMe to be true');
 
   var status = problems.length ? 'FAIL' : 'PASS';
   if (problems.length) fail++; else pass++;

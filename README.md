@@ -41,6 +41,11 @@ Settings — online reputation, auto-move to Spam, and one-time inbox cleanup:
   isn't authenticated *or* aligned-DKIM-signed as it. **Works even when your host strips the
   `Authentication-Results` header** (real mail from your domain is always signed/authenticated;
   if it's neither, it's a spoof).
+- **Your own sent mail is recognized and exempt** — replies you write show no badge and are
+  never flagged or auto-moved. (Your stored sent copy has no auth headers, so without this it
+  would look like a spoof.) The exemption requires proof the message was sent, not received —
+  it's in the Sent folder, or its raw source has no `Received` headers — so an inbound spoof
+  using your exact address is still caught.
 - **Someone using *your* name from an unrelated free-mail address** (e.g. `"Jane Smith" <random@gmail.com>`)
 - Brand impersonation (PayPal, Microsoft, **DocuSign**, banks…) — in the display name
   **or in the body**, when the real sender and links don't belong to that brand
